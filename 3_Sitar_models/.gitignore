@@ -8,6 +8,6 @@ log.txt
 sitar_scons_config.txt
 exe/
 lib/
-
+RESULT_*
 #C++ files generated from sitar descriptions:
 Output/ 

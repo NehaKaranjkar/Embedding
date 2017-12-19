@@ -11,7 +11,6 @@
 #include<map>
 #include"RandomGenerator.h"
 #include"PerturbedParameter.h"
-#include"h_functions.h"
 
 using namespace std;
 using namespace sitar;
@@ -77,17 +76,21 @@ void run_simulation(\
 	TOP.s3.op_Q_probabilities.push_back(1.0-beta);
 	TOP.s3.op_Q_probabilities.push_back(beta);
 
-	//set h_functions for each of the embedded parameters
-	TOP.s1.C_value.set_h(h_inv);
-	TOP.s2.C_value.set_h(h_inv);
-	TOP.s3.C_value.set_h(h_inv);
+	//randomization settings for each of the embedded parameters:
+	int stencil_size =2;
+	double r=1.0;
 
-	TOP.s1.K_value.set_h(h_linear);
-	TOP.s2.K_value.set_h(h_linear);
-	TOP.s3.K_value.set_h(h_linear);
+	//                       (stencil_size, r,   s, parameter value(float));
+	TOP.s1.C_value.initialize(stencil_size, r, -2.0, C1);
+	TOP.s2.C_value.initialize(stencil_size, r, -1.0, C2);
+	TOP.s3.C_value.initialize(stencil_size, r, -2.0, C3);
+
+	TOP.s1.K_value.initialize(stencil_size, r, 1.0, K1);
+	TOP.s2.K_value.initialize(stencil_size, r, 1.0, K2);
+	TOP.s3.K_value.initialize(stencil_size, r, 1.0, K3);
 	
-	TOP.s1.T_value.set_h(h_linear);
-	TOP.s3.T_value.set_h(h_linear);
+	TOP.s1.T_value.initialize(stencil_size, r, 1.0, T1);
+	TOP.s3.T_value.initialize(stencil_size, r, 1.0, T3);
 
 	sitar::restart_simulation();
 	

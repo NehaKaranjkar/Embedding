@@ -3,10 +3,11 @@
 
 
 import random
-
+import sys, os
 
 
 #Create an instance of the optimization problem
+sys.path.insert(0, '../0_Optimization_problem')
 import OptimizationProblem
 
 OP = OptimizationProblem.OptimizationProblem()

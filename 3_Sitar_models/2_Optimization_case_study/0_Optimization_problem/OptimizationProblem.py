@@ -23,7 +23,7 @@ class OptimizationProblem:
         self.sim_length=10000 #simulation length
         self.rand_seed=1 #randomization seed for the simulation
         
-        #default values for other system parameters
+        #default values for other (fixed) system parameters
         self.p=0.5
         self.q2=0.1
         self.K1=1
@@ -38,9 +38,13 @@ class OptimizationProblem:
         self.constraints=[(lambda x,i=i: x[i]-self.param_min_value) for i in range(self.NUM_DIMENSIONS)]
         self.constraints.extend([(lambda x,i=i: self.param_max_value- x[i]) for i in range(self.NUM_DIMENSIONS)])
 
-        #variable to keep track of the
-        #number of times the objective function is called.
+        # variable to keep track of the
+        # number of times the objective function is called.
         self.objective_function_count=0
+        
+        #compute the maximum cost
+        self.X_max_cost = [10,10,10,1,1,10,10]
+        self.max_cost=self.Cost(self.X_max_cost)
 
 
 
@@ -85,14 +89,13 @@ class OptimizationProblem:
             K3=float(x[6])
 
             cost  = 5.0*(C1+C2+C3)
-            cost += 100.0 * 1.0/T1
-            cost += 100.0 * K2
+            cost += 100.0 * (1.0/T1)
+            cost += 500.0 * K2
             cost += 100.0 * K3/T3
             return cost
     
     def NormalizedCost(self,x):
-        max_cost=self.Cost([10,10,10,1,1,10,10])
-        return self.Cost(x)/max_cost
+        return self.Cost(x)/self.max_cost
 
     def Clip(self,x):
         y=[]
@@ -124,11 +127,11 @@ class OptimizationProblem:
 
             #Objective to be minimized:
             objective_value = self.W* cost - throughput
-            #print "x=",x,"f(x)=",objective_value,"W=",self.W,"Norm Throughput = ", throughput,"Norm Cost = ",cost
+            print "x=",x,"f(x)=",objective_value,"W=",self.W,"Norm Throughput = ", throughput,"Norm Cost = ",cost
             return objective_value
 
 
-#OP=OptimizationProblem()
-#OP.ObjectiveFunction([1,1,1,10,10,1,1])
-#OP.ObjectiveFunction([5,5,5,5,5,5,5])
-#OP.ObjectiveFunction([10,10,10,1,1,10,10])
+OP=OptimizationProblem()
+OP.ObjectiveFunction([1,1,1,10,10,1,1])
+OP.ObjectiveFunction([5,5,5,5,5,5,5])
+OP.ObjectiveFunction([10,10,10,1,1,10,10])
