@@ -1,0 +1,13 @@
+*.o
+*.os
+*.so
+*.a
+*.pyc
+*.dblite
+log.txt
+sitar_scons_config.txt
+exe/
+lib/
+
+#C++ files generated from sitar descriptions:
+Output/ 
