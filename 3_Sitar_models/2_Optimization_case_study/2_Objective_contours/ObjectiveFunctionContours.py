@@ -28,7 +28,7 @@ param_min_value=1.0
 param_max_value=10.0
 
 #This is the point at which we want to take slices of the parameter space
-x_base =   [1,1,1,1,2,1,1]
+x_base =   [2,2,2,2,2,2,2]
 
 
 import time
@@ -39,13 +39,14 @@ def sweep(param1, param2, min_val, max_val, step):
 
     X=np.arange(min_val, max_val+step, step)
     Y=np.arange(min_val, max_val+step, step)
+    
     X,Y = np.meshgrid(X,Y)
 
     OP.objective_function_count=0
     
     rows=len(X)
     columns =len(X[0])
-    runs = 1
+    runs = 100
     #Compute the result array Z
     Z = np.empty([rows,columns],dtype=float)
 
@@ -64,7 +65,7 @@ def sweep(param1, param2, min_val, max_val, step):
             t_start = time.time()
             #---------------------
             for run in range (runs):
-                OP.rand_seed=run+42
+                OP.rand_seed=run+42+r+c
                 z.append(OP.ObjectiveFunction(x))
             Z[r][c] = np.mean(z)
             #---------------------
@@ -110,9 +111,9 @@ def plotContours(param1,param2,fig_num=1):
 # param      #  0     1     2     3      4      5     6
 #param_names=["C_1","C_2","C_3", "T_1","T_3", "K_2", "K_3"]
 
-param1 =3
-param2 = 6 
-sweep(param1,param2, min_val=1.0, max_val=10.0, step=1)
+param1 = 1
+param2 = 2 
+sweep(param1,param2, min_val=1.0, max_val=10.0, step=0.25)
 plotContours(param1,param2,fig_num=1)
 
 
