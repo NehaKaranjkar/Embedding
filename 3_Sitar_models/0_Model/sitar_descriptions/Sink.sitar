@@ -1,0 +1,53 @@
+//Sink.sitar
+//
+//Consumes jobs as soon as they arrive into its input queue.
+//The input queue has infinite capacity
+//
+// State variables :
+// jobs_completed : total number of jobs consumed so far
+
+
+
+module Sink
+	include
+	$
+	#include<cassert>
+	#include"RandomGenerator.h"
+	#include"Queue.h"
+	$
+
+	decl
+	$
+	Queue Q; 		
+	long unsigned int jobs_completed;
+	$
+	init
+	$
+	jobs_completed=0;
+	$
+
+	behavior
+	$
+	assert(randomGenerator); 
+	$;
+
+	do
+		wait until (this_phase==0);
+		$
+		while(!Q.empty())
+		{
+			//pull a job
+			Q.pull(); 
+			//increment count
+			jobs_completed++;
+		}
+		$;
+		
+		wait until (this_phase==1);
+		//do nothing in phase1
+		
+		while(1) end do;
+	end behavior
+end module
+
+

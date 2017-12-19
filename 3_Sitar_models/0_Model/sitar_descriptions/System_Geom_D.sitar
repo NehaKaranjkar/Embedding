@@ -1,0 +1,13 @@
+//Model of a Geom_D_1 Queue
+
+module System_Geom_D
+	submodule source:Source
+	submodule server:Server_D
+	
+	//connect the components
+	init
+	$
+	source.Q=&server.Q;
+	$
+end module
+

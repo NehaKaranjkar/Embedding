@@ -1,0 +1,38 @@
+module System_3_servers
+
+	//components
+	submodule source:Source
+	submodule s1:Server_D_splitter
+	submodule s2:Server_Geom_splitter
+	submodule s3:Server_D_splitter
+	submodule sink:Sink
+	
+	//connect the components
+	init
+	$
+	//output of source
+	source.Q=&s1.Q;
+
+	//outputs of s1
+	s1.op_Q_list.push_back(&s2.Q);
+	s1.op_Q_list.push_back(&s3.Q);
+
+	//output of s2
+	s2.op_Q_list.push_back(&sink.Q);
+	s2.op_Q_probabilities.push_back(1.0);
+
+	//outputs of s3
+	s3.op_Q_list.push_back(&sink.Q);
+	s3.op_Q_list.push_back(&s1.Q); //feedback from s3 to s1
+	
+	//the following are set inside Simulate_3_servers.cpp:
+	//
+	//s1.op_Q_probabilities.push_back(1.0-alpha);
+	//s1.op_Q_probabilities.push_back(alpha);
+	//s3.op_Q_probabilities.push_back(1.0-beta);
+	//s3.op_Q_probabilities.push_back(beta);
+	$
+end module
+
+
+

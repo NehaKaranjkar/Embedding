@@ -1,0 +1,160 @@
+//Server_Geom_splitter.sitar
+//
+//Models a node with K identical servers, each with geometrically distributed
+//service times and buffering at the input.  A job served is forwarded to an
+//output queue "qi" with probability "pi".  The pointers to the output queues
+//q1,q2,,,,qn and the probabilites p1,p2,...pn can be specified.  
+//Note: the number of outputs "n" is fixed at compile time.  If a destination queue
+//is full, the job remains in the server for another cycle until it can be pushed to
+//its selected destination queue
+//
+//
+//
+//Parameters :
+//	q (double, 0<q<=1) : probability of finishing an ongoing job in the current cycle
+//	K (double) : number of servers 
+//	C (double) : size of the buffer in front of the server.
+//		if C==0, infinite buffering is modeled.
+//		if C>0, finite buffering, of size C is modeled.
+//	N (long unsigned int) : total number of jobs to be serviced.
+//		if N>0, simulation stops after servicing N jobs.
+//		if N==0, which is default, the server keeps servicing jobs indefinitely.
+//	op_Q_list : array storing pointers to output queues
+//	op_Q_probabilities : probabilities of forwarding jobs to each output queue
+//
+//State variables :
+//	jobs_served : total number of jobs serviced so far
+//	ongoing_jobs : number of jobs currently being served, to be sampled at the end of phase 1
+
+
+
+module Server_Geom_splitter
+	include
+	$
+	#include<cassert>
+	#include"RandomGenerator.h"
+	#include"Queue.h"
+	#include"PerturbedParameter.h"
+	#include"Occupancy.h"
+	$
+
+	//simulation parameters
+	decl
+	$
+	double q;
+	double K;
+	double C;
+	long unsigned int N;
+	$
+
+	//internal variables
+	decl
+	$
+	PerturbedParameter K_value;
+	PerturbedParameter C_value;
+
+	Queue Q;
+	long unsigned int jobs_served;  //number of jobs served so far.
+	int ongoing_jobs;  		//number of ongoing jobs in the server
+	$
+
+	//Variables related to output queues
+	decl
+	$
+	unsigned int num_outputs;
+	std::vector<Queue*> op_Q_list; //pointers to output queues
+	std::vector<double> op_Q_probabilities;//probabilities of forwarding to each output queue
+	std::discrete_distribution<int>* output_queue_distribution;
+	$
+
+	init
+	$
+	C=0;
+	q=0;
+	K=1;
+	N=0;
+	jobs_served=0;
+	ongoing_jobs=0;
+	num_outputs=0;
+	$
+	
+
+	behavior
+		//checks on parameters
+		$
+		assert(randomGenerator);
+		assert(q>0 and q<=1);
+
+		assert(C>=0); assert(C_value.y==C);
+		assert(K>0);  assert(K_value.y==K);
+
+		K_value.setInstantaneousValue();
+		if(C>0) Q.setCapacity(C_value.setInstantaneousValue());
+		$;
+		
+		//Check that the op_Q_list was initialized (by some parent module)
+		$
+		num_outputs = op_Q_list.size();
+		assert(num_outputs);
+		assert(op_Q_probabilities.size()==num_outputs);
+		output_queue_distribution = new std::discrete_distribution<int>
+		 (op_Q_probabilities.begin(),op_Q_probabilities.end());
+		$;
+
+		do
+			
+			//INPUT PHASE
+			wait until (this_phase==0);
+			$
+			//perturb C and K parameters at the start of each cycle
+			if(K!=1)K_value.setInstantaneousValue();
+			if(C>0) 
+			{
+				if(int(Q.size)>=int(C-2)) 
+				Q.setCapacity(C_value.setInstantaneousValue());
+			}
+
+			//pull as many jobs from the queue
+			//as there are free servers.
+			while( (!(Q.empty())) and (ongoing_jobs < K_value.getInstantaneousValue()))
+			{
+				Q.pull();
+				ongoing_jobs ++;
+			}
+			$;
+			
+			wait until (this_phase==1);
+			//iterate through each ongoing job,
+			//and toss a coin to determine if the
+			//job should finish in the current cycle.
+			$
+			int i_max = ongoing_jobs; 
+			int i;
+			for(i=1;i<=i_max;i++)
+			{
+				//see if job i finishes in this cycle
+				if(randomGenerator->get() < q)
+				{
+					//select its destination queue
+					int current_output_queue = (*output_queue_distribution)(randomGenerator->randomEngine);
+					assert(op_Q_list[current_output_queue]); //check that destination queue exists
+
+					//check if the job can be pushed out
+					if(!(op_Q_list[current_output_queue]->full()))
+					{
+						//push it out
+						op_Q_list[current_output_queue]->push();
+
+						//update statistics
+						jobs_served++;
+						ongoing_jobs--;
+					}
+				}
+			}
+			$;
+
+		while((N==0) or (jobs_served<N )) end do;
+		stop simulation;
+	end behavior
+end module
+

@@ -1,0 +1,135 @@
+//Server_D.sitar
+//Models a deterministic server with buffering
+//
+//
+//Parameters :
+//	T (double) : service time
+//	K (double) : number of servers 
+//	C (double) : size of the buffer in front of the server.
+//		if C==0, infinite buffering is modeled.
+//		if C>0, finite buffering, of size C is modeled.
+//	N (long unsigned int) : total number of jobs to be serviced.
+//		if N>0, simulation stops after servicing N jobs.
+//		if N==0, which is default, the server keeps servicing jobs indefinitely.
+//
+//State variables :
+//	jobs_served : total number of jobs serviced so far
+
+
+
+module Server_D
+	include
+	$
+	#include<cassert>
+	#include"RandomGenerator.h"
+	#include"Queue.h"
+	#include"PerturbedParameter.h"
+	#include"Occupancy.h"
+	$
+
+	//simulation parameters
+	decl
+	$
+	double C;
+	double T;
+	double K;
+	long unsigned int N;
+	$
+
+	//internal variables
+	decl
+	$
+	PerturbedParameter C_value;
+	PerturbedParameter T_value;
+	PerturbedParameter K_value;
+	
+	Queue Q;
+	int C_current;
+	int T_current;
+	int K_current;
+
+	long unsigned int jobs_served;  //number of jobs served so far.
+	Occupancy occupancy;  		//data structure for storing occupancy of the server
+	int ongoing_jobs;
+	$
+
+
+	init
+	$
+	C=0;
+	T=0;
+	K=1;
+	N=0;
+	C_current=0;	
+	T_current=0;
+	K_current=0;
+	jobs_served=0;
+	ongoing_jobs=0;
+	$
+
+	behavior
+		//checks on parameters
+		$
+		assert(randomGenerator);
+		
+
+		assert(C>=0); assert(C_value.y==C); 
+		assert(T>=0); assert(T_value.y==T);   
+		assert(K>0);  assert(K_value.y==K);   
+
+		C_current = C_value.setInstantaneousValue();	
+		T_current = T_value.setInstantaneousValue();
+		K_current = K_value.setInstantaneousValue();
+		
+		if(C>0) Q.setCapacity(C_value.setInstantaneousValue());
+		occupancy.initialize(T_current+1);
+		$;
+
+		do
+			
+			wait until (this_phase==0);
+			
+			$
+			//pertub C, K and T values 
+			if(C>0)
+			{
+				if(int(Q.size)>=int(C-2))
+				{	
+				C_current = C_value.setInstantaneousValue();	
+				Q.setCapacity(C_current);
+				}
+			}
+			if(K!=1) K_current = K_value.setInstantaneousValue();
+			T_current = T_value.setInstantaneousValue();
+			occupancy.shiftLeft();
+					
+			//pull as many jobs from the queue
+			//as there are free servers.
+			//For each job accepted from the queue,
+			//select a value of service time T, and 
+			//number of servers K
+			
+			while( (!(Q.empty())) and (occupancy.get()<K_current))
+			{
+				//pull a job
+				Q.pull(); 
+				//increment count
+				jobs_served++;
+				
+			
+				//The job that was just started 
+				//takes 'T_current' cycles to complete.
+				//Increment occupancy of the server for 'T_current' cycles
+				occupancy.increment(T_current);
+			}
+			ongoing_jobs = occupancy.get();
+			$;
+
+			wait until (this_phase==1);
+			//do nothing in phase 1
+
+		while((N==0) or (not (jobs_served>=N and $occupancy.get()==0$))) end do;
+		stop simulation;
+	end behavior
+end module
+

@@ -1,0 +1,70 @@
+//Source.sitar
+//
+//Generates jobs with a poisson arrival
+//
+//Input parameters : 
+// 	p : probability that a job is generated in a cycle
+//	Q : pointer to the queue into which jobs are generated
+//	N : total number of jobs to be generated.
+//	    if(N>0), simulation stops after generating N jobs.
+//	    if(N==0), the module keeps generating jobs.
+//
+// State parameters :
+//  jobs_generated : total number of jobs created so far
+//  jobs_lost : number of jobs lost so far
+
+
+
+module Source
+	include
+	$
+	#include<cassert>
+	#include"RandomGenerator.h"
+	#include"Queue.h"
+	$
+
+	decl
+	$
+	double p; 		
+	Queue* Q; 		
+	long unsigned int N; 	
+	long unsigned int jobs_generated;
+	long unsigned int jobs_lost; 
+	$
+
+	init
+	$
+	p=0.0;
+	Q=NULL;
+	N=0;
+	jobs_generated=0;
+	jobs_lost=0;
+	$
+
+	behavior
+		//these parameters must be set by main()
+		$
+		assert(randomGenerator); 
+		assert(Q); 
+		assert(p); 
+		$;
+		do
+			wait until (this_phase==0);
+			//do  nothing in phase 0
+			
+			wait until (this_phase==1);
+			if(randomGenerator->get() < p) then
+				//generate a job.
+				//If the queue is full,
+				//mark this job as lost
+				$
+				jobs_generated++;
+				if(!Q->push()) jobs_lost++;
+				$;
+			end if;
+		while(N==0 or jobs_generated<N) end do;
+		stop simulation;
+	end behavior
+end module
+
+

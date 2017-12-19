@@ -1,0 +1,216 @@
+//Server_D_splitter.sitar
+//
+//Models a node with K independent deterministic servers with a common buffering at the input. 
+//A job served is forwarded to an output queue "qi" with probability "pi".
+//The pointers to the output queues q1,q2,,,,qn and the probabilites p1,p2,...pn can be specified.
+//Note: the number of outputs "n" is fixed at compile time.
+//If a destination queue is full, the job remains in the server for the next cycle until
+//it can be pushed to its selected destination queue
+//
+//
+//
+//Parameters :
+//	T (double) : service time
+//	K (double) : number of servers 
+//	C (double) : size of the buffer in front of the server.
+//		if C==0, infinite buffering is modeled.
+//		if C>0, finite buffering, of size C is modeled.
+//	N (long unsigned int) : total number of jobs to be serviced.
+//		if N>0, simulation stops after servicing N jobs.
+//		if N==0, which is default, the server keeps servicing jobs indefinitely.
+//	op_Q_list : array storing pointers to output queues
+//	op_Q_probabilities : probabilities of forwarding jobs to each output queue
+//
+//
+//State variables :
+//	jobs_served : total number of jobs serviced so far
+//	ongoing_jobs : number of jobs currently being served, to be sampled at the end of phase 1
+
+
+
+module Server_D_splitter
+	
+	include
+	$
+	#include<cassert>
+	#include"RandomGenerator.h"
+	#include"Queue.h"
+	#include"PerturbedParameter.h"
+	#include"Occupancy.h"
+	$
+
+	//simulation parameters
+	decl
+	$
+	double C;
+	double T;
+	double K;
+	long unsigned int N;
+	$
+
+	//internal variables
+	decl
+	$
+	PerturbedParameter C_value;
+	PerturbedParameter T_value;
+	PerturbedParameter K_value;
+	
+	Queue Q;
+	int C_current;
+	int T_current;
+	int K_current;
+
+	long unsigned int jobs_served;  //number of jobs served so far.
+	Occupancy occupancy;  		//data structure for storing occupancy of the server
+	int ongoing_jobs;
+	$
+	
+	//Variables related to output queues
+	decl
+	$
+	unsigned int num_outputs;
+	std::vector<Queue*> op_Q_list; //pointers to output queues
+	std::vector<double> op_Q_probabilities;//probabilities of forwarding to each output queue
+	std::vector<EndTime*> end_times; //per-queue data structure to maintain time instants at which jobs should finish
+	std::discrete_distribution<int>* output_queue_distribution;
+	$
+
+
+	init
+	$
+	C=0;
+	T=0;
+	K=1;
+	N=0;
+	C_current=0;	
+	T_current=0;
+	K_current=0;
+	jobs_served=0;
+	ongoing_jobs=0;
+	num_outputs=0;
+	$
+
+	behavior
+		//checks on parameters
+		$
+		assert(randomGenerator);
+		
+		assert(C>=0); assert(C_value.y==C); 
+		assert(T>=0); assert(T_value.y==T);   
+		assert(K>0); assert(K_value.y==K);   
+
+		C_current = C_value.setInstantaneousValue();	
+		T_current = T_value.setInstantaneousValue();
+		K_current = K_value.setInstantaneousValue();
+		
+		if(C>0) Q.setCapacity(C_value.setInstantaneousValue());
+		occupancy.initialize(T_current+1);
+		$;
+		
+		//Check that the op_Q_list was initialized (by some parent module)
+		$
+		num_outputs = op_Q_list.size();
+		assert(num_outputs);
+		assert(op_Q_probabilities.size()==num_outputs);
+		output_queue_distribution = new std::discrete_distribution<int>
+		 (op_Q_probabilities.begin(),op_Q_probabilities.end());
+		//create per-output data structures for maintaining end times
+		for(unsigned int i=0;i<num_outputs;i++)
+		{
+			end_times.push_back(new EndTime(T_current+1));				
+		}
+		$;
+
+		do
+			//INPUT PHASE
+			wait until (this_phase==0);
+			
+			//pertub C, K and T values 
+			$
+			if(C>0)
+			{
+				if(int(Q.size)>=int(C-2))
+				{	
+				C_current = C_value.setInstantaneousValue();	
+				Q.setCapacity(C_current);
+				}
+			}
+			if(K!=1) K_current = K_value.setInstantaneousValue();
+			T_current = T_value.setInstantaneousValue();
+			$;
+
+			//Advance in time the occupancy and end-time data structures
+			$
+			occupancy.shiftLeft();
+			for(unsigned int i=0;i<num_outputs;i++) end_times[i]->shiftLeft();
+			$;
+					
+			//pull as many jobs from the queue
+			//as there are free servers.
+			//For each job accepted from the queue,
+			//assign a service time of T_current,
+			//select an output queue for this job 
+			//and note down its end-time
+			$
+			while( (!(Q.empty())) and (occupancy.get()<K_current))
+			{
+				//pull a job
+				Q.pull(); 
+				
+				//The job that was just started will finish in 'T_current' cycles.
+				//Increment occupancy of the server from current to 'T_current' cycles
+				//and record this jobs end time by incrementing the EndTime data structure.
+				occupancy.increment(T_current);
+				
+				//select its destination queue
+				int current_output_queue = (*output_queue_distribution)(randomGenerator->randomEngine);
+				assert(op_Q_list[current_output_queue]); //check that destination queue exists
+				
+				//Remember this job's end time and the destination queue
+				end_times[current_output_queue]->increment(T_current);
+			}
+			ongoing_jobs = occupancy.get();
+			$;
+			
+			//OUTPUT PHASE
+			wait until (this_phase==1);
+			
+			$
+			//for each job that was supposed to end
+			//in this cycle, try to push the job out into
+			//an output queue. If output queue is full,
+			//keep the job till the next cycle and try again.
+
+			//for each output queue
+			for(int current_output_queue=0;current_output_queue<(int)num_outputs;current_output_queue++)
+			{
+				//for each job meant to be finished in the current cycle
+				//and forwarded to current_output_queue:
+				int jobs=end_times[current_output_queue]->get();
+				for(int job=0;job<jobs;job++)
+				{
+					//if the job can't be pushed out yet because the output queue is full,
+					if(op_Q_list[current_output_queue]->full())
+					{
+						//increment occupancy for the next cycle
+						//and mark end time as next cycle
+						occupancy.increment(2);
+						end_times[current_output_queue]->increment(2);
+					}
+					else//else push this job to the output queue 
+					{
+						op_Q_list[current_output_queue]->push();
+						
+						//update statistics
+						ongoing_jobs--;
+						jobs_served++;
+					}
+				}
+			}
+			$;
+
+		while((N==0) or (not (jobs_served>=N and $occupancy.get()==0$))) end do;
+		stop simulation;
+	end behavior
+end module
+
