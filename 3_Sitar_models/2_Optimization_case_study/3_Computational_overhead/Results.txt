@@ -1,0 +1,12 @@
+Sim length = 10^6 slots
+runs per point = 100
+
+Num parameters embedded =  0 X= [2, 2, 2, 2, 2, 2, 2] avg time per sim =  0.393297119141 overhead =  0.0  %
+Num parameters embedded =  1 X= [2.5, 2, 2, 2, 2, 2, 2] avg time per sim =  0.417015590668 overhead =  6.03067512392  %
+Num parameters embedded =  2 X= [2.5, 2.5, 2, 2, 2, 2, 2] avg time per sim =  0.432230558395 overhead =  9.89924343708  %
+Num parameters embedded =  3 X= [2.5, 2.5, 2.5, 2, 2, 2, 2] avg time per sim =  0.449222686291 overhead =  14.2196737348  %
+Num parameters embedded =  4 X= [2.5, 2.5, 2.5, 2.5, 2, 2, 2] avg time per sim =  0.47439766407 overhead =  20.6206811549  %
+Num parameters embedded =  5 X= [2.5, 2.5, 2.5, 2.5, 2.5, 2, 2] avg time per sim =  0.49123903513 overhead =  24.9027799143  %
+Num parameters embedded =  6 X= [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2] avg time per sim =  0.524439151287 overhead =  33.3442646193  %
+Num parameters embedded =  7 X= [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5] avg time per sim =  0.545926659107 overhead =  38.8076933541  %
+
