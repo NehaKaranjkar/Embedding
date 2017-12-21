@@ -19,7 +19,7 @@ class PerturbedParameter
 	public:
 		double y;  //the assigned continuous value
 		int instantaneous_value; //instantaneous value of the rand variable
-		int y_is_int; //true when y is an integer
+		bool y_is_int; //true when y is an integer
 
 		//randomization parameters:
 		double r;

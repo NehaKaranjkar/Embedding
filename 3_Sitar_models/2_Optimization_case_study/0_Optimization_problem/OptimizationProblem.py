@@ -127,11 +127,12 @@ class OptimizationProblem:
 
             #Objective to be minimized:
             objective_value = self.W* cost - throughput
-            print "x=",x,"f(x)=",objective_value,"W=",self.W,"Norm Throughput = ", throughput,"Norm Cost = ",cost
+            #print "x=",x,"f(x)=",objective_value,"W=",self.W,"Norm Throughput = ", throughput,"Norm Cost = ",cost
             return objective_value
 
 
-OP=OptimizationProblem()
-OP.ObjectiveFunction([1,1,1,10,10,1,1])
-OP.ObjectiveFunction([5,5,5,5,5,5,5])
-OP.ObjectiveFunction([10,10,10,1,1,10,10])
+#Test:
+#OP=OptimizationProblem()
+#OP.ObjectiveFunction([1,1,1,10,10,1,1])
+#OP.ObjectiveFunction([5,5,5,5,5,5,5])
+#OP.ObjectiveFunction([10,10,10,1,1,10,10])
