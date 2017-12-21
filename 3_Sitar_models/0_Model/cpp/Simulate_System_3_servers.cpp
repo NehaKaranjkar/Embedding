@@ -82,15 +82,14 @@ void run_simulation(\
 
 	//                       (stencil_size, r,   s, parameter value(float));
 	TOP.s1.C_value.initialize(stencil_size, r, -2.0, C1);
-	TOP.s2.C_value.initialize(stencil_size, r, -1.0, C2);
+	TOP.s2.C_value.initialize(stencil_size, r,  1.0, C2);
 	TOP.s3.C_value.initialize(stencil_size, r, -2.0, C3);
-
-	TOP.s1.K_value.initialize(stencil_size, r, 1.0, K1);
-	TOP.s2.K_value.initialize(stencil_size, r, 1.0, K2);
-	TOP.s3.K_value.initialize(stencil_size, r, 1.0, K3);
+	TOP.s1.T_value.initialize(stencil_size, r,  1.0, T1);
+	TOP.s3.T_value.initialize(stencil_size, r,  1.0, T3);
+	TOP.s2.K_value.initialize(stencil_size, r,  4.0, K2);
+	TOP.s3.K_value.initialize(stencil_size, r,  1.0, K3);
 	
-	TOP.s1.T_value.initialize(stencil_size, r, 1.0, T1);
-	TOP.s3.T_value.initialize(stencil_size, r, 1.0, T3);
+	TOP.s1.K_value.initialize(stencil_size, r,  1.0, K1);
 
 	sitar::restart_simulation();
 	

@@ -33,10 +33,9 @@ class Embedding_randomization(Embedding_base):
 class Embedding_rounding(Embedding_base):
     name = "rounding"
     def get(self,x):
-        y=[]
         for i in range(len(x)):
-            y.append(int(round(float(x[i]))))
-        return y
+            x[i]=(int(round(float(x[i]))))
+        return x
     def get_simulation_length(self,sim_budget):
         return sim_budget
 

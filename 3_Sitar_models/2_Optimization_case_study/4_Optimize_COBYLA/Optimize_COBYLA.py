@@ -70,6 +70,7 @@ def generate_initial_guesses(num_guesses, dimensions,bounds):
 import Initial_guesses
 initial_guesses = Initial_guesses.initial_guesses
 NUM_TRIALS=len(initial_guesses)
+NUM_TRIALS=100
 
 
 #Python list to store the results
@@ -79,7 +80,7 @@ Result = namedtuple('Result', 'x_opt f_opt throughput_opt cost_opt fevals time')
 
 
 #Lengths of Simulation runs
-simulation_budget = [1000, 10000, 100000, 1000000]
+simulation_budget = [1000,10000,100000,1000000]
 sim_length_best = max(simulation_budget)
 
 
@@ -119,13 +120,13 @@ def Run_COBYLA(embedding_method):
             x_opt = fmin_cobyla(func=OP.ObjectiveFunction, 
 				x0=x_start,
 				cons=OP.constraints,
-                                iprint=0,
-				rhobeg=5,
+				rhobeg=3,
 				rhoend=1e-3)
             t_end=time.time()
 
-            #round x_opt to the nearest decimal point
-            x_opt = OP.Round(x_opt)
+            #round x_opt to the nearest decimal point,
+            #and clip it to lie within the domain 
+            x_opt = OP.Round(OP.Clip(x_opt))
             
             #compute results, using the best possible simulation_length:
             OP.sim_length = sim_length_best
@@ -156,24 +157,42 @@ def Run_COBYLA(embedding_method):
     results_file.close()
 
 
-def Summarize_results(result_filename):
+def Summarize_results(embedding_method):
+    result_filename = "RESULTS_COBYLA_"+embedding_method.name
     imp = __import__(result_filename)
     R = imp.RESULTS
+    
+    fname = "RESULTS_COBYLA_"+embedding_method.name+"_summary.txt"
+    output_file = open(fname, 'w+')
     for i in range(len(R)):
-        print ""
-        print "Sim budget =",simulation_budget[i],"simulation length = ", OP.embedding_method.get_simulation_length(simulation_budget[i]),
         
         fopt = [ R[i][j].f_opt for j in range(len(R[i]))]
-        fevals = [ R[i][j].f_opt for j in range(len(R[i]))]
-        times = [ R[i][j].f_opt for j in range(len(R[i]))]
+        fevals = [ R[i][j].fevals for j in range(len(R[i]))]
+        times = [ R[i][j].time for j in range(len(R[i]))]
         
-        print "fopt best=",min(fopt),
-        print "fopt worst=",max(fopt),
-        print "fopt avg=",np.mean(fopt),
-        print "fopt stdev=",np.std(fopt, ddof=1 if len(fopt)>1 else 0),
+        print >>output_file, ""
+        print >>output_file, "Sim budget =",simulation_budget[i],"simulation length = ", embedding_method.get_simulation_length(simulation_budget[i]),
+        print >>output_file,"fopt best=",min(fopt),
+        print >>output_file,"fopt worst=",max(fopt),
+        print >>output_file,"fopt avg=",np.mean(fopt),
+        print >>output_file,"fopt stdev=",np.std(fopt),
+        
+        print >>output_file,"fevals min=",min(fevals),
+        print >>output_file,"fevals max=",max(fevals),
+        print >>output_file,"fevals avg=",np.mean(fevals),
+        print >>output_file,"fevals stdev=",np.std(fevals),
+  
+        print >>output_file,"times min=",min(times),
+        print >>output_file,"times max=",max(times),
+        print >>output_file,"times avg=",np.mean(times),
+        print >>output_file,"times stdev=",np.std(times),
+        #output_file.close()
 
-embedding_method = OptimizationProblem.Embedding_randomization()
+#Select the embedding method:
+embedding_method = OptimizationProblem.Embedding_rounding()
+
+#Run optimization
 Run_COBYLA(embedding_method)
-Summarize_results("RESULTS_COBYLA_"+embedding_method.name)
+Summarize_results(embedding_method)
 
 
