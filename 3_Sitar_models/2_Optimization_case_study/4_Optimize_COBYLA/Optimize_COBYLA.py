@@ -70,7 +70,7 @@ def generate_initial_guesses(num_guesses, dimensions,bounds):
 import Initial_guesses
 initial_guesses = Initial_guesses.initial_guesses
 NUM_TRIALS=len(initial_guesses)
-NUM_TRIALS=100
+NUM_TRIALS=1000
 
 
 #Python list to store the results
@@ -80,8 +80,8 @@ Result = namedtuple('Result', 'x_opt f_opt throughput_opt cost_opt fevals time')
 
 
 #Lengths of Simulation runs
-simulation_budget = [1000,10000,100000,1000000]
-sim_length_best = max(simulation_budget)
+simulation_budget = [100000]
+sim_length_best = 1000000
 
 
 def Run_COBYLA(embedding_method):
@@ -120,7 +120,7 @@ def Run_COBYLA(embedding_method):
             x_opt = fmin_cobyla(func=OP.ObjectiveFunction, 
 				x0=x_start,
 				cons=OP.constraints,
-				rhobeg=3,
+				rhobeg=2,
 				rhoend=1e-3)
             t_end=time.time()
 
@@ -189,7 +189,7 @@ def Summarize_results(embedding_method):
         #output_file.close()
 
 #Select the embedding method:
-embedding_method = OptimizationProblem.Embedding_rounding()
+embedding_method = OptimizationProblem.Embedding_randomization()
 
 #Run optimization
 Run_COBYLA(embedding_method)

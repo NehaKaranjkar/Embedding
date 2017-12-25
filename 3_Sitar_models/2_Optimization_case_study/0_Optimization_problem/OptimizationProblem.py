@@ -122,10 +122,10 @@ class OptimizationProblem:
             K2=float(x[5])
             K3=float(x[6])
 
-            cost  = 5.0*(C1+C2+C3)
-            cost += 100.0 * (1.0/T1)
-            cost += 500.0 * K2
-            cost += 100.0 * K3/T3
+            cost  = 1.0*(C1+C2+C3)
+            cost += 20.0 * (1.0/T1)
+            cost += 100.0 * K2
+            cost += 20.0 * K3/T3
             return cost
     
     def NormalizedCost(self,x):
