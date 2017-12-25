@@ -14,7 +14,7 @@ OP = OptimizationProblem.OptimizationProblem()
 OP.sim_length=1000000
 OP.rand_seed=42
 dimensions=OP.NUM_DIMENSIONS
-runs_per_dimension = 100
+runs_per_dimension = 10
 
 #param      #  0     1     2     3      4      5     6
 param_names=["C_1","C_2","C_3", "T_1","T_3", "K_2", "K_3"]
@@ -24,7 +24,7 @@ param_max_value=10.0
 #This is the base point 
 #relative to which 
 #we compute the overhead
-x_base =   [2,2,2,2,2,2,2]
+x_base =   [5,5,5,5,5,5,5]
 
 
 def compute_overheads():

@@ -1,12 +1,10 @@
-Sim length = 10^6 slots
-runs per point = 100
-
-Num parameters embedded =  0 X= [2, 2, 2, 2, 2, 2, 2] avg time per sim =  0.393297119141 overhead =  0.0  %
-Num parameters embedded =  1 X= [2.5, 2, 2, 2, 2, 2, 2] avg time per sim =  0.417015590668 overhead =  6.03067512392  %
-Num parameters embedded =  2 X= [2.5, 2.5, 2, 2, 2, 2, 2] avg time per sim =  0.432230558395 overhead =  9.89924343708  %
-Num parameters embedded =  3 X= [2.5, 2.5, 2.5, 2, 2, 2, 2] avg time per sim =  0.449222686291 overhead =  14.2196737348  %
-Num parameters embedded =  4 X= [2.5, 2.5, 2.5, 2.5, 2, 2, 2] avg time per sim =  0.47439766407 overhead =  20.6206811549  %
-Num parameters embedded =  5 X= [2.5, 2.5, 2.5, 2.5, 2.5, 2, 2] avg time per sim =  0.49123903513 overhead =  24.9027799143  %
-Num parameters embedded =  6 X= [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2] avg time per sim =  0.524439151287 overhead =  33.3442646193  %
-Num parameters embedded =  7 X= [2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5] avg time per sim =  0.545926659107 overhead =  38.8076933541  %
+Num parameters embedded =  0 X= [5, 5, 5, 5, 5, 5, 5] avg time per sim =  0.218160462379 overhead =  0.0  %
+Num parameters embedded =  0 X= [5, 5, 5, 5, 5, 5, 5] avg time per sim =  0.2172986269 overhead =  0.0  %
+Num parameters embedded =  1 X= [5.5, 5, 5, 5, 5, 5, 5] avg time per sim =  0.229465603828 overhead =  5.59919641569  %
+Num parameters embedded =  2 X= [5.5, 5.5, 5, 5, 5, 5, 5] avg time per sim =  0.230468916893 overhead =  6.0609172645  %
+Num parameters embedded =  3 X= [5.5, 5.5, 5.5, 5, 5, 5, 5] avg time per sim =  0.230259728432 overhead =  5.9646495318  %
+Num parameters embedded =  4 X= [5.5, 5.5, 5.5, 5.5, 5, 5, 5] avg time per sim =  0.244789814949 overhead =  12.6513399746  %
+Num parameters embedded =  5 X= [5.5, 5.5, 5.5, 5.5, 5.5, 5, 5] avg time per sim =  0.259846758842 overhead =  19.5804881742  %
+Num parameters embedded =  6 X= [5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5] avg time per sim =  0.270140242577 overhead =  24.3175101614  %
+Num parameters embedded =  7 X= [5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5] avg time per sim =  0.288000440598 overhead =  32.5367052275  %
 
