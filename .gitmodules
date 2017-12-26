@@ -1,0 +1,3 @@
+[submodule "noisyopt"]
+	path = noisyopt
+	url = git@github.com:NehaKaranjkar/noisyopt.git
