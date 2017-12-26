@@ -1,0 +1,2 @@
+
+Simulation length =  10000 fopt best= -0.6842 fopt worst= 0.477911111111 fopt avg= -0.196496634921 fopt stdev= 0.335873409771 fevals min= 1000 fevals max= 1000 fevals avg= 1000.0 fevals stdev= 0.0 times min= 2.0855050087 times max= 2.69831800461 times avg= 2.32896294355 times stdev= 0.190324843987

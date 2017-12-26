@@ -7,38 +7,6 @@ import os,sys
 sys.path.insert(0, '../../0_Model')
 from SimulationWrapper_System_3_servers import *
 
-#Embedding settings used for optimization:
-
-#Base class
-class Embedding_base:
-    name = "base"
-
-    def get(self,x):
-        return x
-    def get_simulation_length(self,sim_budget):
-        return sim_budget
-
-#Randomization-based embedding:
-class Embedding_randomization(Embedding_base):
-    name = "randomization"
-    def get(self,x):
-        return x
-    def get_simulation_length(self,sim_budget):
-        randomization_overhead = .3
-        sim_length = int(float(sim_budget)/(1+randomization_overhead))
-        return sim_length
-
-
-# Nearest-neighbour-rounding-based embedding:
-class Embedding_rounding(Embedding_base):
-    name = "rounding"
-    def get(self,x):
-        for i in range(len(x)):
-            x[i]=(int(round(float(x[i]))))
-        return x
-    def get_simulation_length(self,sim_budget):
-        return sim_budget
-
 
 class OptimizationProblem:
     
@@ -54,8 +22,6 @@ class OptimizationProblem:
         self.sim_length=10000 #simulation length
         self.rand_seed=1 #randomization seed for the simulation
 
-        #default method used to obtain the embedding:
-        self.embedding_method = Embedding_base()
         
         #default values for other (fixed) system parameters
         self.p=0.5
@@ -152,9 +118,6 @@ class OptimizationProblem:
             
             self.objective_function_count += 1
             
-            #embed x:
-            x = self.embedding_method.get(x)
-
             #clip all parameter values to lie in the interval [1,10] 
             #and convert to float
             x = self.Clip(x)

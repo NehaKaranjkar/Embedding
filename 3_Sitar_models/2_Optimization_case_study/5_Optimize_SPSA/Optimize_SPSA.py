@@ -1,4 +1,4 @@
-#Optimize using COBYLA
+#Optimize using SPSA
 
 import os,sys
 
@@ -22,48 +22,8 @@ OP = OptimizationProblem.OptimizationProblem()
 import random
 import time
 import numpy as np
-from scipy.optimize import fmin_cobyla
-
-
-#remove duplicate entries from a list
-def remove_duplicates(list_x):
-    x = list_x[:]
-    for i in range(len(x)):
-        if(i>=len(x)):
-            break
-        for j in range(len(x)):
-            if(j>=len(x)):
-                break
-            if(i!=j and x[i]==x[j]):
-                del x[j]
-    return x
-                
-#generate an array of initial guesses 
-#and store it in a file:
-def generate_initial_guesses(num_guesses, dimensions,bounds):
-
-    random.seed(1)
-    initial_guesses=[]
-    while (len(initial_guesses)<num_guesses):
-        #add a row
-        initial_guesses.append([])
-        #populate it
-        for j in range(dimensions):
-            initial_guesses[-1].append(random.randint(bounds[j][0],bounds[j][1]))
-        #remove duplicates
-        initial_guesses = remove_duplicates(initial_guesses)
-
-    print "Initial guesses: (",len(initial_guesses),")",initial_guesses
-    #store the array to a file:
-    initial_guesses_file = open("Initial_guesses.py", "w")
-    print >>initial_guesses_file, "initial_guesses=",
-    print >>initial_guesses_file, initial_guesses
-    initial_guesses_file.close()
-
-
-
-#Run the following only once to generate the initial guesses:
-#generate_initial_guesses(num_guesses=1000, dimensions=OP.NUM_DIMENSIONS, bounds=OP.bounds)
+#from scipy.optimize import fmin_cobyla
+from noisyopt import minimizeSPSA
 
 
 #read initial guesses into an array
@@ -83,7 +43,7 @@ simulation_budget = [10000]
 sim_length_best = max(simulation_budget)
 
 
-def Run_COBYLA():
+def Run_SPSA():
 
     
     for l in range(len(simulation_budget)) :
@@ -108,22 +68,23 @@ def Run_COBYLA():
             t_start = time.time()
 
             #perform an optimization run
-            x_opt = fmin_cobyla(func=OP.ObjectiveFunction, 
+            res  = minimizeSPSA(func=OP.ObjectiveFunction, 
 				x0=x_start,
-				cons=OP.constraints,
-                                maxfun=1000,
-				rhobeg=5.0,
-				rhoend=0.1)
+                                bounds=OP.bounds,
+                                paired=False,
+                                niter=500,
+				disp=False)
             t_end=time.time()
 
             #round x_opt to the nearest decimal point,
             #and clip it to lie within the domain 
-            x_opt = OP.Round(OP.Clip(x_opt))
+            
+            x_opt = OP.Round(OP.Clip(res.x))
             
             #compute results, using the best possible simulation_length:
             OP.sim_length = sim_length_best
 
-            fevals = OP.objective_function_count 
+            fevals = OP.objective_function_count-1 
             f_opt = OP.ObjectiveFunction(x_opt)
             throughput_opt = OP.NormalizedThroughput(x_opt)
             cost_opt = OP.NormalizedCost(x_opt)
@@ -138,7 +99,7 @@ def Run_COBYLA():
     
     print " =============================================================="
     #write the Result array out to a file
-    fname = "RESULTS_COBYLA.py"
+    fname = "RESULTS_SPSA.py"
     print " Printing results to file",fname,"..."
     results_file = open(fname, "w")
     print >>results_file, "from collections import namedtuple"
@@ -150,11 +111,11 @@ def Run_COBYLA():
 
 
 def Summarize_results():
-    result_filename = "RESULTS_COBYLA"
+    result_filename = "RESULTS_SPSA"
     imp = __import__(result_filename)
     R = imp.RESULTS
     
-    fname = "RESULTS_COBYLA_summary.txt"
+    fname = "RESULTS_SPSA_summary.txt"
     output_file = open(fname, 'w+')
     for i in range(len(R)):
         
@@ -181,7 +142,7 @@ def Summarize_results():
         #output_file.close()
 
 #Run optimization
-Run_COBYLA()
+Run_SPSA()
 Summarize_results()
 
 
