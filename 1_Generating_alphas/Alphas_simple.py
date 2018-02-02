@@ -71,7 +71,7 @@ def get_stencil(y):
 
 def L(k,y):
     
-    s=-2.0  #skew
+    s=1.0  #skew
     r=1.0 # compaction parameter
     
     stencil = get_stencil(y)
@@ -107,7 +107,7 @@ def plotAlphas(Y,alphas):
     ylim = [-0.2, 1.2]
 
     from pylab import rcParams
-    rcParams['figure.figsize'] = 4.5, 6
+    rcParams['figure.figsize'] = 4, 6
 
     plt.grid()
     ax=[]
@@ -131,30 +131,31 @@ def plotAlphas(Y,alphas):
         ax[i].set_xlim(xlim)
         ax[i].set_ylim(ylim)
         ax[i].grid()
+        
+        #draw a vertical line at y=2.8
+        plt.axvline(x=2.8, linewidth=2,color="k",linestyle="--")
 
     #plot the sum of all alphas
     ax.append(plt.subplot(K+1,1,1, sharex=ax[0]))
     plt.setp(ax[K].get_xticklabels(), visible=False)
     plt.plot(Y,alphas_sum,linewidth=2, color="k")
-    ax[K].set_ylabel(r"$\sum_{k=1}^{"+str(K)+r"}{\alpha_i^k (y)}\quad$ ",rotation=0,fontsize=12,labelpad=10)
+    ax[K].set_ylabel(r"$\sum_{k=1}^{"+str(K)+r"}{\alpha_i^k (y)}\quad$ ",rotation=0,fontsize=13,labelpad=10)
     ax[K].set_yticks(yticks)
     ax[K].set_xlim(xlim)
     ax[K].set_ylim([0.7,1.4])
+
+    #draw a vertical line at y=2.8
+    plt.axvline(x=2.8, linewidth=2,color="k",linestyle="--")
+
     ax[K].grid()
 
 
     plt.subplots_adjust(wspace=0, hspace=0, left=0.2)
     plt.legend()
-    plt.savefig("alphas.pdf")
+    plt.savefig("alphas_simple.pdf")
     plt.show()
 
 def plot_moments(Y,alphas,alphas_mean):
-    alphas_mean=[]
-    for i in range(len(alphas[0])):
-        alphas_sum.append(sum([alphas[k][i] for k in range(len(alphas))]))
-        alphas_mean.append(sum([alphas[k][i]*(k+1) for k in range(len(alphas))]))
-    
-
     plt.figure(2)
     plt.plot(Y,alphas_mean,linewidth=2, color="K",label="Mean")
 
@@ -177,6 +178,5 @@ for k in range(1,K+1):
 #plot alphas
 plotAlphas(Y,alphas)
 
-plot_moments(Y,alphas)
 
     
