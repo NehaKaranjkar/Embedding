@@ -57,10 +57,10 @@ C=0 #infinite buffering
 K=1
 NUM_RUNS=100
 
-#Randomization generator functions
-h_function_C=1  #use h(y)=1/y
-h_function_K=0  #use h(y)=y
-h_function_T=0  #use h(y)=y
+#Randomization parameters:
+stencil_size =2 
+r = 1
+s = 1
 
 def sweep():
     for i in range(len(y)):
@@ -69,7 +69,7 @@ def sweep():
         start_time=time.time()
         for j in range(NUM_RUNS):
             rand_seed = 42+j
-            pb, avg_num, throughput = SimulationWrapper_SingleServer.run_simulation_with_deterministic_servers( rand_seed, sim_length, p, C, T, K, h_function_C, h_function_K, h_function_T)
+            pb, avg_num, throughput = SimulationWrapper_SingleServer.run_simulation_with_deterministic_servers( rand_seed, sim_length, p, C, T, K, stencil_size, r, s)
             fy_values.append(avg_num)
         
         end_time=time.time()
@@ -116,7 +116,7 @@ def plot():
     plt.fill_between(y,y1,y2, alpha=0.1, edgecolor='b',facecolor='b',label=r"$\pm$"+str(n)+r"$ \sigma$ interval")
     plt.legend().draggable()
 
-    plt.xlabel("Service Time "+r"$T$")
+    plt.xlabel("Service Time "+r"$y$")
     plt.ylabel("Average number of jobs in system "+r"$f(y)$")
     plt.grid()
     plt.show()

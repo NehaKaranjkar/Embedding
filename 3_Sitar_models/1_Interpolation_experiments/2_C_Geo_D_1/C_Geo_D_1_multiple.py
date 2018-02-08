@@ -138,8 +138,8 @@ def plot():
     ax1.legend().draggable()
     f.text(0.5, 0.04, "Queue capacity "+r"$y$", ha='center')
     f.text(0.04, 0.5, "Blocking Probability "+r"$f(y)$", va='center', rotation='vertical')
+    #plt.savefig("GD1_C_multiple.pdf")
     plt.show()
-
 
 
 plot()
