@@ -52,18 +52,16 @@ q=0.51
 C=0 #infinite buffering
 NUM_RUNS=100
 
-#Randomization generator functions
-h_function_C=1  #use h(y)=1/y
-h_function_K=0  #use h(y)=y
+stencil_size=2
 
-def sweep():
+def sweep(r,s):
     for i in range(len(y)):
         K=float(y[i])
         fy_values=[]
         start_time=time.time()
         for j in range(NUM_RUNS):
             rand_seed = 42+j
-            pb, avg_num, throughput = SimulationWrapper_SingleServer.run_simulation_with_geom_servers( rand_seed, sim_length, p, C, q, K, h_function_C, h_function_K)
+            pb, avg_num, throughput = SimulationWrapper_SingleServer.run_simulation_with_geom_servers( rand_seed, sim_length, p, C, q, K, stencil_size, r, s)
             fy_values.append(avg_num)
         
         end_time=time.time()
@@ -115,7 +113,7 @@ def plot():
     plt.show()
 
 
-sweep()
+sweep(r=1,s=1)
 print "y=",y
 plot()
 

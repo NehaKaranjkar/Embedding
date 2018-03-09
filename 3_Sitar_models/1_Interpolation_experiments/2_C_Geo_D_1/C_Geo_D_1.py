@@ -23,20 +23,17 @@ sim_length=10000
 p=0.49
 T=2
 K=1
-h_function_C =1 #use h(y)=1/y
-h_function_K =0 #use h(y)=y
-h_function_T =0 #use h(y)=y
 
 NUM_RUNS=100
-
-def sweep():
+stencil_size=2
+def sweep(r,s):
     for i in range(len(y)):
         C=float(y[i])
         fy_values=[]
         start_time=time.time()
         for j in range(NUM_RUNS):
             rand_seed = 42+j
-            pb, avg_num, throughput = SimulationWrapper_SingleServer.run_simulation_with_deterministic_servers( rand_seed, sim_length, p, C, T, K,h_function_C,h_function_K,h_function_T)
+            pb, avg_num, throughput = SimulationWrapper_SingleServer.run_simulation_with_deterministic_servers( rand_seed, sim_length, p, C, T, K,stencil_size, r, s)
             fy_values.append(pb)
         
         end_time=time.time()
@@ -88,7 +85,7 @@ def plot():
     plt.show()
 
 
-sweep()
+sweep(r=1,s=-1)
 print "y=",y
 plot()
 
